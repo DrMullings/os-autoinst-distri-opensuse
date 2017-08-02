@@ -21,10 +21,21 @@ sub run {
 
     assert_screen 'partitioning-edit-proposal-button', 40;
 
+    if (check_screen ("install-from-iso-wrong-hdd")) {
+        check_screen 'create-partition-setup', 40;
+        send_key 'alt-c';   #create partition setup
+        save_screenshot;
+        send_key 'alt-1';   #use disk 1
+        save_screenshot;
+        send_key 'alt-n';   #next
+        send_key 'alt-e';   #use entire disk
+        save_screenshot;
+        send_key 'alt-n';   #next
+    }
+
     if (get_var("DUALBOOT")) {
         assert_screen 'partitioning-windows', 40;
     }
-
 }
 
 1;

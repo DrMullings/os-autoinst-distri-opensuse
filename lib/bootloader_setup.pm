@@ -404,7 +404,7 @@ sub specific_bootmenu_params {
     }
 
     if (check_var('ISO_IN_EXTERNAL_DRIVE',1)) {
-        $args .= "install=hd:/?device=vdb1/install.iso";
+        $args .= "install=hd:/install.iso";
     }
 
     if (check_var('ARCH', 's390x')) {

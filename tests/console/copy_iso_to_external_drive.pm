@@ -27,8 +27,9 @@ sub run() {
     $self->set_unpartitioned_disk_in_bash;
 
     #partition HDD2
-    assert_script_run "parted \$disk mklabel gpt";
-    assert_script_run "parted -a opt \$disk mkpart primary ext4 0% 100%";
+    script_run 'echo "Disk: $disk"';
+    assert_script_run 'parted $disk mklabel gpt';
+    assert_script_run 'parted -a opt $disk mkpart primary ext4 0% 25%';
     assert_script_run "mkfs.ext4 \$disk'1'";
 
     #mount HDD2
@@ -39,7 +40,6 @@ sub run() {
 
     #check if copy worked
     assert_script_run "` [[ -s /mnt/install.iso  ]]`";
-    select_console "x11";
 }
 
 1;
