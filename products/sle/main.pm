@@ -1534,10 +1534,17 @@ else {
             loadtest 'installation/first_boot';
         }
         else {
-            load_boot_tests();
-            load_inst_tests();
-            return 1 if get_var('EXIT_AFTER_START_INSTALL');
-            load_reboot_tests();
+            if (check_var ('DISTRI', 'sle') && check_var ('VERSION','15')) {
+                loadtest 'boot/boot_to_desktop';
+            }
+            else
+            {
+                load_boot_tests();
+                load_inst_tests();
+            
+                return 1 if get_var('EXIT_AFTER_START_INSTALL');
+                load_reboot_tests();
+            }
         }
     }
     unless (load_applicationstests() || load_slenkins_tests()) {

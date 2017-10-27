@@ -24,14 +24,23 @@ sub run {
     # disable packagekitd
     script_run 'systemctl mask packagekit.service';
     script_run 'systemctl stop packagekit.service';
-    # toolchain channels
-    if (!check_var('ADDONS', 'tcm')) {
-        my $arch = get_var('ARCH');
-        assert_script_run "zypper ar -f http://download.suse.de/ibs/SUSE/Products/SLE-Module-Toolchain/12/$arch/product/ SLE-Module-Toolchain12-Pool";
-        assert_script_run "zypper ar -f http://download.suse.de/ibs/SUSE/Updates/SLE-Module-Toolchain/12/$arch/update/ SLE-Module-Toolchain12-Updates";
+
+    # keep old way for sle 12
+    if (is_sle() && sle_version_at_least ('12') && !(sle_version_at_least('15'))) {
+        # toolchain channels
+        if (!check_var('ADDONS', 'tcm')) {
+            my $arch = get_var('ARCH');
+            assert_script_run "zypper ar -f http://download.suse.de/ibs/SUSE/Products/SLE-Module-Toolchain/12/$arch/product/ SLE-Module-Toolchain12-Pool";
+            assert_script_run "zypper ar -f http://download.suse.de/ibs/SUSE/Updates/SLE-Module-Toolchain/12/$arch/update/ SLE-Module-Toolchain12-Updates";
+        }
+        zypper_call('in -t pattern gcc5');
+        zypper_call('up');
     }
-    zypper_call('in -t pattern gcc5');
-    zypper_call('up');
+    # sle 15
+    else {
+        zypper_call 'in gcc';
+    }
+
     # reboot when runing processes use deleted files after packages update
     type_string "zypper ps|grep 'PPID' || echo OK | tee /dev/$serialdev\n";
     if (!wait_serial("OK", 100)) {
@@ -39,8 +48,8 @@ sub run {
         $self->wait_boot;
         select_console('root-console');
     }
-    script_run 'export CC=/usr/bin/gcc-5';
-    script_run 'export CXX=/usr/bin/g++-5';
+    script_run 'export CC=/usr/bin/gcc';
+    script_run 'export CXX=/usr/bin/g++';
     script_run 'lscpu';
     script_run 'free -m';
     save_screenshot;
