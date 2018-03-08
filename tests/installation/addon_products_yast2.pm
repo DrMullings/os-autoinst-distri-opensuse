@@ -51,7 +51,8 @@ sub run {
                 send_key_until_needlematch "addon-dvd-sr$sr_number", 'down', 10;    # select addon in list
                 send_key 'alt-o';                                                   # continue
             }
-            if (check_screen('import-untrusted-gpg-key', 10)) {                     # workaround untrusted key pop-up, record soft fail and trust it
+            if (check_screen('import-untrusted-gpg-key', 10))
+            {    # workaround untrusted key pop-up, record soft fail and trust it
                 record_soft_failure;
                 send_key 'alt-t';
             }
@@ -63,56 +64,66 @@ sub run {
             else {
                 assert_screen "addon-license-$addon";
             }
-            wait_screen_change { send_key 'alt-a' };                                # yes, agree
+            wait_screen_change { send_key 'alt-a' };    # yes, agree
             send_key $cmd{next};
             assert_screen 'addon-yast2-patterns';
             send_key_until_needlematch 'addon-yast2-view-selected', 'alt-v', 10;
-            send_key 'spc';                                                         # open view menu
+            send_key 'spc';                             # open view menu
             wait_screen_change { send_key 'alt-r' };
-            wait_screen_change { send_key 'alt-r' };                                # go to repositories
-            send_key 'ret';                                                         # open repositories tab
+            wait_screen_change { send_key 'alt-r' };    # go to repositories
+            send_key 'ret';                             # open repositories tab
             assert_screen "addon-yast2-repo-$addon";
-            send_key 'alt-a';                                                       # accept
+            send_key 'alt-a';                           # accept
             assert_screen 'automatic-changes';
-            send_key 'alt-o';                                                       # OK
-            if (check_screen 'unsupported-packages', 5) {
-                record_soft_failure 'unsupported packages';
-                send_key 'alt-o';
+            send_key 'alt-o';                           # OK
+            #new code
+            my @needles   = qw(unsupported-package addon-installation-pop-up addon-installation-report);
+            my $starttime = time;
+            until (match_has_tag('addon-installation-report')) {
+                check_screen \@needles, 1;
+                if (match_has_tag('unsupported-packages')) {
+                    record_soft_failure 'unsuppoorted packages';
+                    send_key 'alt-o';
+                }
+                if (match_has_tag('addon-installation-pop-up')) {
+                    $perform_reboot = 1;
+                    send_key 'alt-o';
+                }
+                if (time - $starttime > 300) {
+                    die "Timeout during installation";
+                }
             }
-            if (check_screen 'addon-installation-pop-up', 100) {                    # e.g. RT reboot to activate new kernel
-                $perform_reboot = 1;
-                send_key 'alt-o';                                                   # OK
-            }
-            assert_screen "addon-installation-report";
-            send_key 'alt-f';                                                       # finish
+            send_key 'alt-f';    # finish
+            send_key 'esc';      # might be obsolete sometimes, closes tab which should not be opened
+            send_key 'alt-a';    # accept
             assert_screen 'scc-registration';
             if (get_var('SCC_REGISTER')) {
                 fill_in_registration_data;
-                if ($addon ne 'sdk') {                                              # sdk doesn't ask for code
+                if ($addon ne 'sdk') {    # sdk doesn't ask for code
                     my $regcode = get_var("SCC_REGCODE_$uc_addon");
                     assert_screen "addon-reg-code";
-                    send_key 'tab';                                                 # jump to code field
+                    send_key 'tab';       # jump to code field
                     type_string $regcode;
                     sleep 1;
                     save_screenshot;
                     send_key $cmd{next};
                 }
                 assert_screen 'addon-products', 60;
-                wait_screen_change { send_key "tab" };                              # select addon-products-$addon
+                wait_screen_change { send_key "tab" };    # select addon-products-$addon
                 send_key "pgup",                                    1;
                 send_key_until_needlematch "addon-products-$addon", 'down';
             }
             else {
                 skip_registration;
                 if (check_screen("scc-skip-base-system-reg-warning")) {
-                    wait_screen_change { send_key "alt-y" };                        # confirmed skip SCC registration
+                    wait_screen_change { send_key "alt-y" };    # confirmed skip SCC registration
                 }
             }
-            if ((split(/,/, get_var('ADDONS')))[-1] ne $addon) {                    # if $addon is not first from all ADDONS
-                send_key 'alt-a';                                                   # add another add-on
+            if ((split(/,/, get_var('ADDONS')))[-1] ne $addon) {    # if $addon is not first from all ADDONS
+                send_key 'alt-a';                                   # add another add-on
             }
             else {
-                send_key 'alt-o';                                                   # ok continue
+                send_key 'alt-o';                                   # ok continue
             }
         }
         if (defined $perform_reboot) {
@@ -121,12 +132,12 @@ sub run {
         }
     }
     else {
-        send_key 'alt-n';                                                           # done
+        send_key 'alt-n';                                           # done
     }
 }
 
 sub test_flags {
-    return {fatal => 1, milestone => 1};                                            # add milestone flag to save setup in lastgood VM snapshot
+    return {fatal => 1, milestone => 1};    # add milestone flag to save setup in lastgood VM snapshot
 }
 
 1;
