@@ -76,7 +76,6 @@ sub run {
             send_key 'alt-a';                           # accept
             assert_screen 'automatic-changes';
             send_key 'alt-o';                           # OK
-            #new code
             my @needles   = qw(unsupported-package addon-installation-pop-up addon-installation-report);
             my $starttime = time;
             until (match_has_tag('addon-installation-report')) {
