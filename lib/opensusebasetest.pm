@@ -329,8 +329,13 @@ sub wait_boot {
 
     # Reset the consoles after the reboot: there is no user logged in anywhere
     reset_consoles;
+
+    if (check_var('ARCH', 'ppc64le')) {
+        # give ppc another 120 seconds since it's slow sometimes
+        $ready_time += 120;
+    }
     # reconnect s390
-    if (check_var('ARCH', 's390x')) {
+    elsif (check_var('ARCH', 's390x')) {
         my $login_ready = get_login_message();
         if (check_var('BACKEND', 's390x')) {
             my $console = console('x3270');
