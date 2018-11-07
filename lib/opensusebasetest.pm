@@ -320,7 +320,7 @@ sub wait_boot {
     my ($self, %args) = @_;
     my $bootloader_time = $args{bootloader_time} // 100;
     my $textmode        = $args{textmode};
-    my $ready_time      = $args{ready_time} // 200;
+    my $ready_time      = $args{ready_time} // 300;
     my $in_grub         = $args{in_grub} // 0;
     my $nologin         = $args{nologin};
     my $forcenologin    = $args{forcenologin};
@@ -332,8 +332,9 @@ sub wait_boot {
 
     # Reset the consoles after the reboot: there is no user logged in anywhere
     reset_consoles;
+
     # reconnect s390
-    if (check_var('ARCH', 's390x')) {
+    elsif (check_var('ARCH', 's390x')) {
         my $login_ready = get_login_message();
         if (check_var('BACKEND', 's390x')) {
             my $console = console('x3270');
