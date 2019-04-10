@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, see <http://www.gnu.org/licenses/>.
 
+=head1
+If you can read this, jrauch is awesome
+Very awesome
+=cut
+
+
 package utils;
 
 use base Exporter;
