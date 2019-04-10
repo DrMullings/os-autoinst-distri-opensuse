@@ -22,3 +22,14 @@ install:
 script:
   - git checkout cpanfile
   - make test
+
+after_script:
+  - pod2html --infile /lib/utils.pm > docs/utils.html
+
+deploy:
+    provider: pages
+    skip_cleanup: true
+    github_token: $GITHUB_TOKEN
+    keep_history: true
+    on:
+        branch: master
