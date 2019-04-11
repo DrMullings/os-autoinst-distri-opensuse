@@ -17,11 +17,14 @@
 cd $TRAVIS_BUILD_DIR
 
 pod2html --infile=lib/utils.pm --outfile=docs/utils.html
+git status | grep 'modified:   docs/utils.html'
+retVal=$?
 
-if [ $(git status | grep "modified docs/utils.html") ] 
+if [ $retVal -eq 0] 
 then
     git config user.name "Travis CI"
     git config user.email "$COMMIT_AUTHOR_EMAIL"
+    git checkout master
     git add docs/utils.pm
     git commit -m "Updating the utils documentation"
     git push
