@@ -14,8 +14,19 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, see <http://www.gnu.org/licenses/>.
 
+NEW_DEPLOY_NEEDED=0
+
 cd $TRAVIS_BUILD_DIR
 
 touch docs/utils.html
 pod2html --infile=lib/utils.pm --outfile=docs/utils.html
 
+#checkout old docs and compare to new ones, then toggle flag accordingly
+git diff gh-pages -- docs/utils.html
+retVal=$?
+if [ retVal -eq 0 ]
+then
+    NEW_DEPLOY_NEEDED=1
+else
+    NEW_DEPLOY_NEEDED=0
+fi
