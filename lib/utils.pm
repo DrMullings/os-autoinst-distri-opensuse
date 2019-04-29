@@ -28,6 +28,7 @@ use Mojo::UserAgent;
 
 =head1
 if you can read this, travis works fine
+if you can read this conditional deployment works fine
 =cut
 
 our @EXPORT = qw(
