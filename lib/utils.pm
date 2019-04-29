@@ -169,6 +169,7 @@ sub handle_grub_zvm {
 TODO someone should document this
 =cut
 sub handle_untrusted_gpg_key {
+    # This should not change, so no new deployments?
     if (match_has_tag('import-known-untrusted-gpg-key')) {
         record_info('Import', 'Known untrusted gpg key is imported');
         wait_screen_change { send_key 'alt-t' };    # import
