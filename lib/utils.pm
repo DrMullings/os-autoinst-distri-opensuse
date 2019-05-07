@@ -32,6 +32,8 @@ if you can read this conditional deployment works fine
 if you can read this, the condition was met
 =cut
 
+# just a commment to check deploy mechanism
+
 our @EXPORT = qw(
   check_console_font
   clear_console
